@@ -1,0 +1,97 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #111;
+    margin: 0;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+canvas {
+    border: 2px solid #fff;
+    background: #222;
+    margin: 16px 0;
+    max-width: 90vw;
+    height: auto;
+}
+
+.hud {
+    display: flex;
+    gap: 24px;
+    color: #fff;
+    font-size: 1.2rem;
+    justify-content: center;
+}
+
+.controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+button {
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+button:focus, button:hover {
+    background: #555;
+}
+
+.tetromino {
+    border-radius: 3px;
+}
+
+.score {
+    color: #fff;
+    font-size: 24px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+.game-over {
+    color: #ff0000;
+    font-size: 48px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.side-panels {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 12px;
+    color: #fff;
+    justify-content: center;
+}
+.side-panels canvas {
+    background: #222;
+    border: 1px solid #fff;
+    margin-top: 4px;
+}
+
+.touch-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.touch-controls button {
+    font-size: 1.5rem;
+    padding: 10px 16px;
+}

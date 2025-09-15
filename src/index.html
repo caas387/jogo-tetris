@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris</title>
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+    <main>
+        <div class="hud">
+            <div id="score" aria-live="polite">Score: 0</div>
+            <div id="level" aria-live="polite">Level: 1</div>
+            <div id="lines" aria-live="polite">Linhas: 0</div>
+        </div>
+        <div class="side-panels">
+            <div>
+                <span>Próxima</span>
+                <canvas id="next" width="120" height="120" aria-label="Próxima peça"></canvas>
+            </div>
+            <div>
+                <span>Hold</span>
+                <canvas id="hold" width="120" height="120" aria-label="Peça guardada"></canvas>
+            </div>
+        </div>
+        <canvas id="tetris" width="300" height="600" aria-label="Área do jogo Tetris" tabindex="0"></canvas>
+        <div class="controls">
+            <button id="startBtn" aria-label="Iniciar">Iniciar</button>
+            <button id="pauseBtn" aria-label="Pausar">Pausar</button>
+            <button id="resetBtn" aria-label="Resetar">Resetar</button>
+            <button id="muteBtn" aria-label="Mutar">🔊</button>
+        </div>
+        <div class="touch-controls">
+            <button id="leftBtn" aria-label="Esquerda">◀️</button>
+            <button id="downBtn" aria-label="Baixo">🔽</button>
+            <button id="rightBtn" aria-label="Direita">▶️</button>
+            <button id="rotateBtn" aria-label="Girar">⟳</button>
+            <button id="dropBtn" aria-label="Drop">⏬</button>
+            <button id="holdBtn" aria-label="Hold">H</button>
+        </div>
+    </main>
+    <script type="module" src="scripts/main.js"></script>
+</body>
+</html>
