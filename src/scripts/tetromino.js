@@ -34,7 +34,6 @@ class Tetromino {
 }
 
 export const TETROMINOS = [
-    // I
     {
         shape: [
             [0, 0, 0, 0],
@@ -42,65 +41,65 @@ export const TETROMINOS = [
             [0, 0, 0, 0],
             [0, 0, 0, 0]
         ],
-        color: '#00f0f0'
+        fruit: 'uva',
+        img: 'frutas/uva.png'
     },
-    // J
     {
         shape: [
             [1, 0, 0],
             [1, 1, 1],
             [0, 0, 0]
         ],
-        color: '#0000f0'
+        fruit: 'pera',
+        img: 'frutas/pera.png'
     },
-    // L
     {
         shape: [
             [0, 0, 1],
             [1, 1, 1],
             [0, 0, 0]
         ],
-        color: '#f0a000'
+        fruit: 'melancia',
+        img: 'frutas/melancia.png'
     },
-    // O
     {
         shape: [
             [1, 1],
             [1, 1]
         ],
-        color: '#f0f000'
+        fruit: 'maca',
+        img: 'frutas/maca.png'
     },
-    // S
     {
         shape: [
             [0, 1, 1],
             [1, 1, 0],
             [0, 0, 0]
         ],
-        color: '#00f000'
+        fruit: 'laranja',
+        img: 'frutas/laranja.png'
     },
-    // T
     {
         shape: [
             [0, 1, 0],
             [1, 1, 1],
             [0, 0, 0]
         ],
-        color: '#a000f0'
+        fruit: 'banana',
+        img: 'frutas/banana.png'
     },
-    // Z
     {
         shape: [
             [1, 1, 0],
             [0, 1, 1],
             [0, 0, 0]
         ],
-        color: '#f00000'
+        fruit: 'abacaxi',
+        img: 'frutas/abacaxi.png'
     }
 ];
 
 export function rotate(matrix) {
-    // Rotação 90 graus
     return matrix[0].map((_, i) => matrix.map(row => row[i])).reverse();
 }
 

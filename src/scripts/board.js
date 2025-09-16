@@ -13,12 +13,17 @@ export class Board {
         this.grid = this.createBoard();
     }
 
-    draw(ctx, squareSize) {
+    draw(ctx, squareSize, fruitImages) {
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
-                ctx.fillStyle = this.grid[y][x] || '#222';
-                ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
-                ctx.strokeStyle = '#111';
+                const fruit = this.grid[y][x];
+                if (fruit && fruitImages[fruit]) {
+                    ctx.drawImage(fruitImages[fruit], x * squareSize, y * squareSize, squareSize, squareSize);
+                } else {
+                    ctx.fillStyle = '#222';
+                    ctx.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+                }
+                ctx.strokeStyle = '#333';
                 ctx.strokeRect(x * squareSize, y * squareSize, squareSize, squareSize);
             }
         }
@@ -30,7 +35,7 @@ export class Board {
                 if (value) {
                     const x = tetromino.x + dx;
                     const y = tetromino.y + dy;
-                    if (y >= 0) this.grid[y][x] = tetromino.color;
+                    if (y >= 0) this.grid[y][x] = tetromino.fruit;
                 }
             });
         });
@@ -39,7 +44,11 @@ export class Board {
     sweep() {
         let lines = 0;
         this.grid = this.grid.filter(row => {
-            if (row.every(cell => cell)) {
+            const firstFruit = row[0];
+            if (
+                firstFruit &&
+                row.every(cell => cell === firstFruit)
+            ) {
                 lines++;
                 return false;
             }

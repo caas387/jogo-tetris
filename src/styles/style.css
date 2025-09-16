@@ -1,97 +1,211 @@
+/* Fundo cartoon */
 body {
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: #111;
     margin: 0;
+    background: linear-gradient(135deg, #aee9ff 0%, #ffe6a7 100%);
 }
 
-main {
+/* Container ocupa toda a tela */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Painéis laterais cartoon */
+.bonus-panel, .next-panel {
+    background: #fffbe6;
+    color: #ff9800;
+    border-radius: 24px;
+    padding: 2vw 1vw;
+    min-width: 160px;
+    max-width: 20vw;
+    box-shadow: 0 4px 16px #0002;
+    border: 4px solid #ffd966;
+    font-size: 1.1rem;
+}
+
+/* Área do jogo cartoon */
+.game-area {
+    flex: 1 1 0;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: stretch;
+    max-width: 600px;
+}
+
+/* HUD cartoon */
+.hud-top {
+    display: flex;
+    gap: 2vw;
+    justify-content: center;
+    margin-bottom: 1vw;
+    font-size: 1.2rem;
+    font-family: 'Fredoka One', 'Comic Sans MS', Arial, sans-serif;
+    color: #ff9800;
+    flex-wrap: wrap;
+}
+
+/* Painéis de próxima/hold */
+.panels {
+    display: flex;
+    gap: 2vw;
+    margin-bottom: 1vw;
+    justify-content: center;
+}
+.panels > div {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-
-canvas {
-    border: 2px solid #fff;
-    background: #222;
-    margin: 16px 0;
-    max-width: 90vw;
-    height: auto;
+.panels canvas {
+    background: #e3f6ff;
+    border: 3px solid #ffd966;
+    margin-bottom: 4px;
+    border-radius: 16px;
+    width: 10vw;
+    height: 10vw;
+    max-width: 80px;
+    max-height: 80px;
+    min-width: 48px;
+    min-height: 48px;
 }
-
-.hud {
-    display: flex;
-    gap: 24px;
-    color: #fff;
-    font-size: 1.2rem;
-    justify-content: center;
-}
-
-.controls {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 8px;
-}
-
-button {
-    background: #333;
-    color: #fff;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 4px;
+.panels span {
     font-size: 1rem;
+    color: #ff9800;
+    font-family: 'Fredoka One', 'Comic Sans MS', Arial, sans-serif;
+}
+
+/* Tabuleiro responsivo */
+.board-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px; /* Espaço entre canvas e controles */
+}
+canvas#tetris {
+    width: 320px !important;
+    height: 640px !important;
+    max-width: 320px;
+    max-height: 640px;
+    min-width: 320px;
+    min-height: 640px;
+    aspect-ratio: 10 / 20; /* Mantém proporção do Tetris */
+    background: #222;
+    border: 4px solid #ffd966;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px #0002;
+    display: block;
+}
+
+/* Mensagem de bônus cartoon */
+#bonus-message {
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: #ff9800;
+    font-weight: bold;
+    text-shadow: 2px 2px 8px #fffbe6;
+    pointer-events: none;
+    font-family: 'Fredoka One', 'Comic Sans MS', Arial, sans-serif;
+}
+
+/* Botões grandes e cartoon */
+.controls, .touch-controls {
+    display: flex;
+    gap: 2vw;
+    margin-top: 2vw;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+button {
+    background: #ffd966;
+    color: #ff9800;
+    border: 3px solid #ff9800;
+    padding: 1vw 2vw;
+    border-radius: 16px;
+    font-size: 1.3rem;
     cursor: pointer;
-    transition: background 0.2s;
+    font-family: 'Fredoka One', 'Comic Sans MS', Arial, sans-serif;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #0001;
+    transition: background 0.2s, transform 0.1s;
 }
 button:focus, button:hover {
-    background: #555;
+    background: #fffbe6;
+    transform: scale(1.07);
+    outline: none;
 }
 
-.tetromino {
-    border-radius: 3px;
-}
-
-.score {
-    color: #fff;
-    font-size: 24px;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-}
-
-.game-over {
-    color: #ff0000;
-    font-size: 48px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: none;
-}
-
-.side-panels {
+/* Próximas peças cartoon */
+#next-pieces {
     display: flex;
-    gap: 32px;
-    margin-bottom: 12px;
-    color: #fff;
-    justify-content: center;
-}
-.side-panels canvas {
-    background: #222;
-    border: 1px solid #fff;
-    margin-top: 4px;
-}
-
-.touch-controls {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
     flex-wrap: wrap;
+    gap: 1vw;
+    margin-top: 1vw;
     justify-content: center;
 }
-.touch-controls button {
-    font-size: 1.5rem;
-    padding: 10px 16px;
+.next-piece-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #fffbe6;
+    border: 3px solid #ffd966;
+    object-fit: contain;
+    box-shadow: 0 2px 8px #0001;
+}
+
+/* Aumenta contraste e acessibilidade */
+canvas, button, .panels canvas {
+    outline: none;
+}
+
+/* Fontes cartoon */
+body, .hud-top, .bonus-panel, .next-panel, .game-area, button {
+    font-family: 'Fredoka One', 'Comic Sans MS', Arial, sans-serif;
+    letter-spacing: 1px;
+}
+
+/* Responsivo para telas pequenas */
+@media (max-width: 900px) {
+    .container {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        padding: 2vw 0;
+    }
+    .game-area {
+        padding: 2vw 1vw;
+    }
+    canvas#tetris {
+        width: 90vw;
+        height: 60vw;
+        max-width: 98vw;
+        max-height: 80vw;
+        min-width: 180px;
+        min-height: 320px;
+    }
+    .panels canvas {
+        width: 16vw;
+        height: 16vw;
+        max-width: 80px;
+        max-height: 80px;
+        min-width: 32px;
+        min-height: 32px;
+    }
 }

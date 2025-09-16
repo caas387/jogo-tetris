@@ -22,13 +22,3 @@ export function checkCollision(board, tetromino, offsetX = 0, offsetY = 0, shape
     }
     return false;
 }
-
-function mergeTetromino(board, tetromino) {
-    for (let y = 0; y < tetromino.shape.length; y++) {
-        for (let x = 0; x < tetromino.shape[y].length; x++) {
-            if (tetromino.shape[y][x] !== 0) {
-                board.grid[tetromino.y + y][tetromino.x + x] = tetromino.color;
-            }
-        }
-    }
-}

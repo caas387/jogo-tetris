@@ -7,51 +7,50 @@ const ctx = canvas.getContext('2d');
 const scoreEl = document.getElementById('score');
 const levelEl = document.getElementById('level');
 const linesEl = document.getElementById('lines');
+const timerEl = document.getElementById('timer');
+const comboEl = document.getElementById('combo');
+const serieEl = document.getElementById('serie');
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const resetBtn = document.getElementById('resetBtn');
-const muteBtn = document.getElementById('muteBtn');
-
 const nextCanvas = document.getElementById('next');
 const nextCtx = nextCanvas.getContext('2d');
 const holdCanvas = document.getElementById('hold');
 const holdCtx = holdCanvas.getContext('2d');
+const bonusMsg = document.getElementById('bonus-message');
+const nextPiecesDiv = document.getElementById('next-pieces');
 
 const COLS = 10;
 const ROWS = 20;
 const SQ = 30;
 
-let board, tetromino, nextTetromino, score, level, lines, dropTimer, paused, gameOver;
+let board, tetromino, nextTetromino, nextQueue, score, level, lines, combo, serie, timer, dropTimer, paused, gameOver;
 let holdTetromino = null;
 let canHold = true;
-let muted = false;
 
-const sounds = {
-    move: new Audio('https://cdn.jsdelivr.net/gh/rafaelalmeidatk/tetris-sounds/move.mp3'),
-    rotate: new Audio('https://cdn.jsdelivr.net/gh/rafaelalmeidatk/tetris-sounds/rotate.mp3'),
-    drop: new Audio('https://cdn.jsdelivr.net/gh/rafaelalmeidatk/tetris-sounds/drop.mp3'),
-    line: new Audio('https://cdn.jsdelivr.net/gh/rafaelalmeidatk/tetris-sounds/line.mp3'),
-    gameover: new Audio('https://cdn.jsdelivr.net/gh/rafaelalmeidatk/tetris-sounds/gameover.mp3')
-};
-
-function playSound(name) {
-    if (!muted && sounds[name]) {
-        sounds[name].currentTime = 0;
-        sounds[name].play();
-    }
-}
+// Carregar imagens das frutas
+const fruitImages = {};
+TETROMINOS.forEach(t => {
+    const img = new Image();
+    img.src = t.img;
+    fruitImages[t.fruit] = img;
+});
 
 function resetGame() {
     board = new Board(COLS, ROWS);
     score = 0;
     level = 1;
     lines = 0;
+    combo = 1;
+    serie = 0;
+    timer = 0;
     paused = false;
     gameOver = false;
     holdTetromino = null;
     canHold = true;
+    nextQueue = [randomTetromino(), randomTetromino(), randomTetromino()];
     tetromino = randomTetromino();
-    nextTetromino = randomTetromino();
+    nextTetromino = nextQueue[0];
     updateHUD();
     updateScreen();
     loop();
@@ -62,7 +61,8 @@ function randomTetromino() {
     const t = TETROMINOS[idx];
     return {
         shape: t.shape.map(row => [...row]),
-        color: t.color,
+        fruit: t.fruit,
+        img: t.img,
         x: Math.floor(COLS / 2) - Math.ceil(t.shape[0].length / 2),
         y: -t.shape.length + 1
     };
@@ -72,9 +72,15 @@ function drawTetromino(t, context = ctx, offsetX = 0, offsetY = 0, size = SQ) {
     t.shape.forEach((row, dy) => {
         row.forEach((val, dx) => {
             if (val) {
-                context.fillStyle = t.color;
-                context.fillRect((t.x + dx + offsetX) * size, (t.y + dy + offsetY) * size, size, size);
-                context.strokeStyle = '#111';
+                const img = fruitImages[t.fruit];
+                context.drawImage(
+                    img,
+                    (t.x + dx + offsetX) * size,
+                    (t.y + dy + offsetY) * size,
+                    size,
+                    size
+                );
+                context.strokeStyle = '#333';
                 context.strokeRect((t.x + dx + offsetX) * size, (t.y + dy + offsetY) * size, size, size);
             }
         });
@@ -84,14 +90,10 @@ function drawTetromino(t, context = ctx, offsetX = 0, offsetY = 0, size = SQ) {
 function drawNextTetromino() {
     nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
     const t = nextTetromino;
-    const size = 30;
     t.shape.forEach((row, y) => {
         row.forEach((val, x) => {
             if (val) {
-                nextCtx.fillStyle = t.color;
-                nextCtx.fillRect(x * size + 15, y * size + 15, size, size);
-                nextCtx.strokeStyle = '#111';
-                nextCtx.strokeRect(x * size + 15, y * size + 15, size, size);
+                nextCtx.drawImage(fruitImages[t.fruit], x * 20 + 20, y * 20 + 20, 20, 20);
             }
         });
     });
@@ -101,31 +103,41 @@ function drawHoldTetromino() {
     holdCtx.clearRect(0, 0, holdCanvas.width, holdCanvas.height);
     if (!holdTetromino) return;
     const t = holdTetromino;
-    const size = 30;
     t.shape.forEach((row, y) => {
         row.forEach((val, x) => {
             if (val) {
-                holdCtx.fillStyle = t.color;
-                holdCtx.fillRect(x * size + 15, y * size + 15, size, size);
-                holdCtx.strokeStyle = '#111';
-                holdCtx.strokeRect(x * size + 15, y * size + 15, size, size);
+                holdCtx.drawImage(fruitImages[t.fruit], x * 20 + 20, y * 20 + 20, 20, 20);
             }
         });
     });
 }
 
+function drawNextPiecesPanel() {
+    nextPiecesDiv.innerHTML = '';
+    nextQueue.forEach(t => {
+        const img = document.createElement('img');
+        img.src = t.img;
+        img.className = 'next-piece-img';
+        nextPiecesDiv.appendChild(img);
+    });
+}
+
 function updateHUD() {
-    scoreEl.textContent = `Score: ${score}`;
-    levelEl.textContent = `Level: ${level}`;
+    scoreEl.textContent = `Pontuação: ${score}`;
+    levelEl.textContent = `Nível: ${level}`;
     linesEl.textContent = `Linhas: ${lines}`;
+    comboEl.textContent = `Combo: x${combo}`;
+    serieEl.textContent = `Série: ${serie}`;
+    timerEl.textContent = `Tempo: ${timer}`;
 }
 
 function updateScreen() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    board.draw(ctx, SQ);
+    board.draw(ctx, SQ, fruitImages);
     drawTetromino(tetromino);
     drawNextTetromino();
     drawHoldTetromino();
+    drawNextPiecesPanel();
 }
 
 function drop() {
@@ -133,24 +145,27 @@ function drop() {
         board.merge(tetromino);
         const cleared = board.sweep();
         if (cleared) {
-            score += [0, 40, 100, 300, 1200][cleared] * level;
+            score += 100 * cleared * level * combo;
             lines += cleared;
-            playSound('line');
+            serie += cleared;
+            combo = Math.min(combo + 1, 5);
+            showBonusMessage(tetromino.fruit, cleared);
             if (lines >= level * 10) {
                 level++;
             }
+        } else {
+            combo = 1;
+            serie = 0;
         }
-        tetromino = nextTetromino;
-        nextTetromino = randomTetromino();
+        tetromino = nextQueue.shift();
+        nextQueue.push(randomTetromino());
+        nextTetromino = nextQueue[0];
         canHold = true;
         if (checkCollision(board, tetromino)) {
             gameOver = true;
             clearTimeout(dropTimer);
-            playSound('gameover');
             alert('Game Over!');
         }
-    } else {
-        playSound('drop');
     }
     updateHUD();
     updateScreen();
@@ -160,7 +175,6 @@ function move(dx, dy) {
     if (!checkCollision(board, tetromino, dx, dy)) {
         tetromino.x += dx;
         tetromino.y += dy;
-        playSound('move');
         updateScreen();
         return true;
     }
@@ -171,30 +185,32 @@ function rotateTetromino() {
     const rotated = rotate(tetromino.shape);
     if (!checkCollision(board, tetromino, 0, 0, rotated)) {
         tetromino.shape = rotated;
-        playSound('rotate');
         updateScreen();
     }
 }
 
 function holdCurrentTetromino() {
     if (!canHold) return;
-    playSound('move');
     if (!holdTetromino) {
         holdTetromino = {
             shape: tetromino.shape.map(row => [...row]),
-            color: tetromino.color
+            fruit: tetromino.fruit,
+            img: tetromino.img
         };
-        tetromino = nextTetromino;
-        nextTetromino = randomTetromino();
+        tetromino = nextQueue.shift();
+        nextQueue.push(randomTetromino());
+        nextTetromino = nextQueue[0];
     } else {
         [holdTetromino, tetromino] = [
             {
                 shape: tetromino.shape.map(row => [...row]),
-                color: tetromino.color
+                fruit: tetromino.fruit,
+                img: tetromino.img
             },
             {
                 shape: holdTetromino.shape.map(row => [...row]),
-                color: holdTetromino.color,
+                fruit: holdTetromino.fruit,
+                img: holdTetromino.img,
                 x: Math.floor(COLS / 2) - Math.ceil(holdTetromino.shape[0].length / 2),
                 y: -holdTetromino.shape.length + 1
             }
@@ -206,10 +222,19 @@ function holdCurrentTetromino() {
     updateScreen();
 }
 
+function showBonusMessage(fruit, lines) {
+    bonusMsg.textContent = `+${lines * 100} BÔNUS DISPONÍVEL\n${fruit.toUpperCase()}`;
+    setTimeout(() => {
+        bonusMsg.textContent = '';
+    }, 1200);
+}
+
 function loop() {
     if (paused || gameOver) return;
     dropTimer = setTimeout(() => {
         drop();
+        timer++;
+        updateHUD();
         loop();
     }, Math.max(100, 1000 - (level - 1) * 100));
 }
@@ -238,10 +263,6 @@ pauseBtn.onclick = () => {
     if (!paused) loop();
 };
 resetBtn.onclick = () => resetGame();
-muteBtn.onclick = () => {
-    muted = !muted;
-    muteBtn.textContent = muted ? '🔇' : '🔊';
-};
 
 // Touch controls
 document.getElementById('leftBtn').onclick = () => move(-1, 0);
@@ -250,5 +271,23 @@ document.getElementById('downBtn').onclick = () => move(0, 1);
 document.getElementById('rotateBtn').onclick = () => rotateTetromino();
 document.getElementById('dropBtn').onclick = () => { while (move(0, 1)) {} drop(); };
 document.getElementById('holdBtn').onclick = () => holdCurrentTetromino();
+
+// No main.js, ao iniciar:
+function resizeCanvas() {
+    const boardWrapper = document.querySelector('.board-wrapper');
+    const w = boardWrapper.offsetWidth;
+    const h = boardWrapper.offsetHeight;
+    // Mantém proporção 10x20
+    let canvasWidth = w;
+    let canvasHeight = w * 2;
+    if (canvasHeight > h) {
+        canvasHeight = h;
+        canvasWidth = h / 2;
+    }
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
 resetGame();
